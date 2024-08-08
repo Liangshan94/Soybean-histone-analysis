@@ -1,0 +1,8 @@
+## alignment
+fastp -i sample.R1.fq.gz -I sample.R2.fq.gz -o sample.r1.fq.gz -O sample.r2.fq.gz --detect_adapter_for_pe -w 4 --compression 9 -h sample.html -j sample.json && bwa mem -M -t 4 genome.fasta sample.r1.fq.gz sample.r2.fq.gz > sample.sam && samtools view -bS -F 1804 -f 2 -q 30 sample.sam | samtools sort - | samtools rmdup -s - sample.raw.bam && java -XX:ParallelGCThreads=4 -XX:ConcGCThreads=4 -Xmx8000M -jar picard.jar MarkDuplicates I=sample.raw.bam O=sample.rmdup.bam M=sample.txt REMOVE_DUPLICATES=true
+
+## call peak
+macs2 callpeak -t sample.rmdup.bam -c Input.rmdup.bam -p 1e-3 -f BAM --keep-dup all -g 978000000 -n sample
+
+## bigwig file
+bamCoverage -p 4 -bs 10 --effectiveGenomeSize 978000000 --normalizeUsing RPKM -b sample.rmdup.bam -o sample.bw --smoothLength 50
