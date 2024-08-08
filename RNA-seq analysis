@@ -1,0 +1,5 @@
+## alignment
+fastp -i sample.R1.fastq.gz -I sample.R2.fastq.gz -o sample.r1.fq.gz -O sample.r2.fq.gz --detect_adapter_for_pe -w 4 --compression 9 -h sample.html -j sample.json && hisat2 -x genome -p 8 -5 10 --min-intronlen 20 --max-intronlen 4000 -1 sample.r1.fq.gz -2 sample.r2.fq.gz 2> sample.hisat2.log | samtools view -bS -q 20 -@ 8 | samtools sort - -o sample.sorted.bam
+
+## reads count
+featureCounts -T 16 -t 'CDS' -p -P -B -C -g 'gene_id' -a genome.gtf -o feacount.txt *.sorted.bam
